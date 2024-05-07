@@ -4,6 +4,7 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Canvas
+import android.graphics.Color
 import android.graphics.Paint
 import android.util.AttributeSet
 import android.view.MotionEvent
@@ -18,18 +19,27 @@ class DrawingView @JvmOverloads constructor(
 ) : View(context, attrs, defStyle) {
 
     private val lineDrawer by lazy { LineDrawer(context, invalidate = { invalidate() }) }
-    private lateinit var mBitmap: Bitmap
-    private val mBitmapPaint: Paint by lazy { Paint(Paint.DITHER_FLAG) }
+    private lateinit var mCanvas: Canvas
 
-    private fun initCanvasBitmap(w: Int, h: Int) {
-        mBitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888)
-        lineDrawer.initCanvasBitmap(w, h, mBitmap)
+    private lateinit var mBitmap: Bitmap
+
+    private val mBitmapPaint: Paint by lazy { Paint(Paint.DITHER_FLAG) }
+    private val backgroundPaint by lazy {
+        val paint = Paint().apply {
+            isAntiAlias = true
+            color = Color.WHITE
+            style = Paint.Style.FILL
+        }
+        paint
     }
 
+    private val bmFile3: Bitmap = BitmapFactory.decodeResource(context.resources, R.drawable.test3)
 
     override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
         super.onSizeChanged(w, h, oldw, oldh)
         initCanvasBitmap(w, h)
+
+        mCanvas.drawRect(0f, 0f, w.toFloat(), h.toFloat(), backgroundPaint)
 
         setLayerType(LAYER_TYPE_HARDWARE, null)
     }
@@ -37,8 +47,8 @@ class DrawingView @JvmOverloads constructor(
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
         canvas.drawBitmap(mBitmap, 0f, 0f, mBitmapPaint)
-
         lineDrawer.draw(canvas)
+
     }
 
 
@@ -47,8 +57,22 @@ class DrawingView @JvmOverloads constructor(
         return true
     }
 
+    private fun initCanvasBitmap(w: Int, h: Int) {
+        mBitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888)
+        mCanvas = Canvas(mBitmap)
+
+        lineDrawer.attach(canvas = mCanvas)
+    }
+
     fun erasePaint() {
         lineDrawer.erasePaint()
+    }
+
+    fun addSticker(resId:Int) {
+        val bm =  BitmapFactory.decodeResource(context.resources, resId)
+        if (bm!=null){
+            lineDrawer.addSticker(bm)
+        }
     }
 
     fun editPaint() {

@@ -20,6 +20,7 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
 import com.example.testprogram.databinding.ActivityMainBinding
 import com.example.testprogram.ui.FileManager
+import com.example.testprogram.ui.dialog.StickerDialog
 import kotlinx.coroutines.launch
 
 class MainActivity : AppCompatActivity() {
@@ -44,13 +45,20 @@ class MainActivity : AppCompatActivity() {
         }
 
         eraseImg.setOnClickListener {
-            drawingView.erasePaint()
+            /*drawingView.erasePaint()*/
+            val dialog = StickerDialog(onItemClicked = {
+                if (it == null) return@StickerDialog
+                drawingView.addSticker(it.resId)
+            })
+
+            dialog.show(supportFragmentManager, StickerDialog::class.java.name)
         }
 
         saveImg.setOnClickListener {
             lifecycleScope.launch {
                 fileManager.saveDrawing(this@MainActivity, drawingView.getSavingBitmap())
-                Toast.makeText(this@MainActivity, "Image saved successfully!", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this@MainActivity, "Image saved successfully!", Toast.LENGTH_SHORT)
+                    .show()
             }
         }
         seekBar.setOnSeekBarChangeListener(object : OnSeekBarChangeListener {
@@ -69,15 +77,4 @@ class MainActivity : AppCompatActivity() {
 
     }
 
-    fun requestPermission(){
-        if (ContextCompat.checkSelfPermission(
-                this, Manifest.permission.WRITE_EXTERNAL_STORAGE) !=
-            PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(
-                this,
-               arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE) ,
-                1001
-            );
-        }
-    }
 }

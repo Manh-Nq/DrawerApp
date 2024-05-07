@@ -2,7 +2,6 @@ package com.example.testprogram.ui.custom
 
 import android.content.Context
 import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
@@ -10,11 +9,13 @@ import android.graphics.Path
 import android.graphics.PorterDuff
 import android.graphics.PorterDuffXfermode
 import android.view.MotionEvent
-import com.example.testprogram.R
 import com.example.testprogram.ui.dpToPx
 import kotlin.math.abs
 
 class LineDrawer(private val context: Context, val invalidate: () -> Unit) {
+
+    private val imageDrawer by lazy { ImageDrawer(context, invalidate = { invalidate() }) }
+
     private val pathPaint by lazy {
         val paint = Paint().apply {
             isAntiAlias = true
@@ -36,14 +37,6 @@ class LineDrawer(private val context: Context, val invalidate: () -> Unit) {
         paint
     }
 
-    private val backgroundPaint by lazy {
-        val paint = Paint().apply {
-            isAntiAlias = true
-            color = Color.WHITE
-            style = Paint.Style.FILL
-        }
-        paint
-    }
 
     private lateinit var mCanvas: Canvas
 
@@ -55,38 +48,40 @@ class LineDrawer(private val context: Context, val invalidate: () -> Unit) {
     private var mX = 0f
     private var mY = 0f
 
-    private val bmFile: Bitmap = BitmapFactory.decodeResource(context.resources, R.drawable.test)
+
 
     companion object {
         private const val TOUCH_TOLERANCE = 4f
     }
 
     fun draw(canvas: Canvas) {
+        imageDrawer.onDraw(canvas)
+
         canvas.drawPath(mPath, pathPaint)
         if (isClearMode && isMoving) {
             canvas.drawCircle(mX, mY, context.dpToPx(circleWidth), circlePaint)
         }
-        mCanvas.drawBitmap(bmFile, 0f, 0f, null)
     }
 
-    fun initCanvasBitmap(w: Int,h:Int,bitmap: Bitmap) {
-        mCanvas = Canvas(bitmap)
-
-        mCanvas.drawRect(0f, 0f, w.toFloat(), h.toFloat(), backgroundPaint)
+    fun attach(canvas: Canvas) {
+        mCanvas = canvas
     }
-
 
 
     fun onTouchEvent(event: MotionEvent) {
-        val x = event.x
-        val y = event.y
-        when (event.action) {
-            MotionEvent.ACTION_DOWN -> touchStart(x, y)
+       val touch =  imageDrawer.onTouchEvent(event)
+        if(!touch){
+            val x = event.x
+            val y = event.y
+            when (event.action) {
+                MotionEvent.ACTION_DOWN -> touchStart(x, y)
 
-            MotionEvent.ACTION_MOVE -> touchMove(x, y)
+                MotionEvent.ACTION_MOVE -> touchMove(x, y)
 
-            MotionEvent.ACTION_UP -> touchUp()
+                MotionEvent.ACTION_UP -> touchUp()
+            }
         }
+
     }
 
     private fun touchStart(x: Float, y: Float) {
@@ -120,6 +115,7 @@ class LineDrawer(private val context: Context, val invalidate: () -> Unit) {
     }
 
     fun erasePaint() {
+        mCanvas.save()
         if (!isClearMode) {
             isClearMode = true
             pathPaint.xfermode = PorterDuffXfermode(PorterDuff.Mode.CLEAR)
@@ -130,7 +126,12 @@ class LineDrawer(private val context: Context, val invalidate: () -> Unit) {
         if (isClearMode) {
             pathPaint.xfermode = null
             isClearMode = false
+            mCanvas.restore()
         }
+    }
+
+    fun addSticker(bitmap: Bitmap){
+        imageDrawer.addBitmap(bitmap)
     }
 
     fun editPaint() {
