@@ -1,7 +1,8 @@
-package com.example.testprogram.ui
+package com.example.testprogram.ui.custom
 
 import android.content.Context
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
@@ -9,6 +10,8 @@ import android.graphics.Path
 import android.graphics.PorterDuff
 import android.graphics.PorterDuffXfermode
 import android.view.MotionEvent
+import com.example.testprogram.R
+import com.example.testprogram.ui.dpToPx
 import kotlin.math.abs
 
 class LineDrawer(private val context: Context, val invalidate: () -> Unit) {
@@ -52,6 +55,8 @@ class LineDrawer(private val context: Context, val invalidate: () -> Unit) {
     private var mX = 0f
     private var mY = 0f
 
+    private val bmFile: Bitmap = BitmapFactory.decodeResource(context.resources, R.drawable.test)
+
     companion object {
         private const val TOUCH_TOLERANCE = 4f
     }
@@ -61,6 +66,7 @@ class LineDrawer(private val context: Context, val invalidate: () -> Unit) {
         if (isClearMode && isMoving) {
             canvas.drawCircle(mX, mY, context.dpToPx(circleWidth), circlePaint)
         }
+        mCanvas.drawBitmap(bmFile, 0f, 0f, null)
     }
 
     fun initCanvasBitmap(w: Int,h:Int,bitmap: Bitmap) {

@@ -8,7 +8,7 @@
     tools:context=".MainActivity">
 
 
-    <com.example.testprogram.ui.DrawingView
+    <com.example.testprogram.ui.custom.DrawingView
         android:background="@color/white"
         android:id="@+id/drawing_view"
         android:layout_width="match_parent"
@@ -48,7 +48,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/erase_img"
         app:layout_constraintTop_toTopOf="@+id/edit_img"
-        app:srcCompat="@drawable/delete_icon" />
+        app:srcCompat="@drawable/save_icon" />
 
     <androidx.appcompat.widget.AppCompatSeekBar
         android:id="@+id/seek_bar"

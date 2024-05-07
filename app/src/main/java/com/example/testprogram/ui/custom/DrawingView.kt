@@ -1,16 +1,15 @@
-package com.example.testprogram.ui
+package com.example.testprogram.ui.custom
 
 import android.content.Context
-import android.graphics.*
-import android.os.Environment
-import android.provider.MediaStore
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.graphics.Canvas
+import android.graphics.Paint
 import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.View
-import android.widget.Toast
-import java.io.File
-import java.io.FileOutputStream
-import java.io.OutputStream
+import com.example.testprogram.R
+
 
 class DrawingView @JvmOverloads constructor(
     context: Context,
@@ -35,10 +34,10 @@ class DrawingView @JvmOverloads constructor(
         setLayerType(LAYER_TYPE_HARDWARE, null)
     }
 
-
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
         canvas.drawBitmap(mBitmap, 0f, 0f, mBitmapPaint)
+
         lineDrawer.draw(canvas)
     }
 
