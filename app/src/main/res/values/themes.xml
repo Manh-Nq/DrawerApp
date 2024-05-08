@@ -7,13 +7,4 @@
 
     <style name="Theme.TestProgram" parent="Base.Theme.TestProgram" />
 
-    <style name="FullScreenDialog" parent="@style/Theme.AppCompat.Light">
-        <item name="windowNoTitle">true</item>
-        <item name="android:windowFrame">@null</item>
-        <item name="android:windowContentOverlay">@null</item>
-        <item name="android:windowTitleStyle">@null</item>
-        <item name="android:colorBackgroundCacheHint">@null</item>
-        <item name="android:windowSoftInputMode">stateUnspecified|adjustPan</item>
-    </style>
-
 </resources>

@@ -2,13 +2,18 @@ package com.example.testprogram.ui
 
 import android.content.Context
 import android.graphics.Bitmap
+import android.graphics.Canvas
 import android.os.Environment
 import android.provider.MediaStore
+import android.view.View
+import android.view.View.MeasureSpec
+import android.view.ViewGroup
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.File
 import java.io.FileOutputStream
 import java.io.OutputStream
+
 
 class FileManager {
     suspend fun saveDrawing(context:Context,bitmap: Bitmap) = withContext(Dispatchers.IO){
@@ -36,5 +41,31 @@ class FileManager {
         } catch (e: Exception) {
             e.printStackTrace()
         }
+    }
+
+    suspend fun saveDrawing(context:Context,view: View) = withContext(Dispatchers.IO){
+        try {
+            val bitmap = loadBitmapFromView(view)
+            saveDrawing(context, bitmap)
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
+
+    private fun loadBitmapFromView(view: View): Bitmap {
+        if (view.measuredHeight <= 0 || view.measuredWidth <= 0) {
+            view.measure(
+                MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED),
+                MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED)
+            )
+            view.layout(0, 0, view.measuredWidth, view.measuredHeight)
+        }
+
+        view.isDrawingCacheEnabled = true
+        view.buildDrawingCache(true)
+        val bitmap = Bitmap.createBitmap(view.drawingCache)
+        view.isDrawingCacheEnabled = false
+
+        return bitmap
     }
 }

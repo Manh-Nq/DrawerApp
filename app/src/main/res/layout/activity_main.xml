@@ -1,61 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
+    android:gravity="center"
+    android:orientation="vertical"
     tools:context=".MainActivity">
 
-
-    <com.example.testprogram.ui.custom.DrawingView
-        android:background="@color/white"
-        android:id="@+id/drawing_view"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        app:layout_constraintBottom_toTopOf="@id/edit_img"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <androidx.appcompat.widget.AppCompatImageView
-        android:id="@+id/edit_img"
-        android:layout_width="48dp"
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/painting_btn"
+        android:layout_width="wrap_content"
         android:layout_height="48dp"
         android:background="?attr/selectableItemBackground"
-        android:scaleType="centerInside"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/erase_img"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/drawing_view"
-        app:srcCompat="@drawable/edit_icon" />
+        android:padding="16dp"
+        android:text="Painting activity" />
 
-    <androidx.appcompat.widget.AppCompatImageView
-        android:id="@+id/erase_img"
-        android:layout_width="48dp"
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/animation_btn"
+        android:layout_width="wrap_content"
         android:layout_height="48dp"
+        android:layout_marginTop="20dp"
         android:background="?attr/selectableItemBackground"
-        android:scaleType="centerInside"
-        app:layout_constraintEnd_toStartOf="@id/save_img"
-        app:layout_constraintStart_toEndOf="@id/edit_img"
-        app:layout_constraintTop_toTopOf="@+id/edit_img"
-        app:srcCompat="@drawable/delete_icon" />
+        android:padding="16dp"
+        android:text="Animation Activity" />
 
-    <androidx.appcompat.widget.AppCompatImageView
-        android:id="@+id/save_img"
-        android:layout_width="48dp"
-        android:layout_height="48dp"
-        android:background="?attr/selectableItemBackground"
-        android:scaleType="centerInside"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@id/erase_img"
-        app:layout_constraintTop_toTopOf="@+id/edit_img"
-        app:srcCompat="@drawable/save_icon" />
 
-    <androidx.appcompat.widget.AppCompatSeekBar
-        android:id="@+id/seek_bar"
-        android:layout_width="match_parent"
-        android:layout_height="48dp"
-        android:max="20"
-        android:min="5"
-        app:layout_constraintBottom_toTopOf="@id/edit_img" />
-
-</androidx.constraintlayout.widget.ConstraintLayout>
+</LinearLayout>

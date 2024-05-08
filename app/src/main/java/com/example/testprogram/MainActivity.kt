@@ -1,32 +1,30 @@
 package com.example.testprogram
 
-import android.Manifest
+import android.content.Intent
 import android.content.pm.PackageManager
+import android.net.Uri
+import android.os.Build
 import android.os.Bundle
-import com.google.android.material.snackbar.Snackbar
+import android.os.Environment
+import android.provider.Settings
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.WindowCompat
-import androidx.navigation.findNavController
-import androidx.navigation.ui.AppBarConfiguration
-import androidx.navigation.ui.navigateUp
-import androidx.navigation.ui.setupActionBarWithNavController
-import android.view.Menu
-import android.view.MenuItem
+import android.view.View
 import android.widget.SeekBar
-import android.widget.SeekBar.OnSeekBarChangeListener
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
 import com.example.testprogram.databinding.ActivityMainBinding
 import com.example.testprogram.ui.FileManager
+import com.example.testprogram.ui.assignViews
 import com.example.testprogram.ui.dialog.StickerDialog
+import com.example.testprogram.ui.listener.CustomOnSeekBarChangeListener
 import kotlinx.coroutines.launch
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), View.OnClickListener {
 
     private lateinit var binding: ActivityMainBinding
-    private val fileManager by lazy { FileManager() }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         WindowCompat.setDecorFitsSystemWindows(window, false)
@@ -40,41 +38,20 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun initViews() = with(binding) {
-        editImg.setOnClickListener {
-            drawingView.editPaint()
-        }
+        assignViews(animationBtn, paintingBtn)
+    }
 
-        eraseImg.setOnClickListener {
-            /*drawingView.erasePaint()*/
-            val dialog = StickerDialog(onItemClicked = {
-                if (it == null) return@StickerDialog
-                drawingView.addSticker(it.resId)
-            })
+    override fun onClick(v: View?) {
+        when (v?.id) {
+            binding.animationBtn.id -> {
 
-            dialog.show(supportFragmentManager, StickerDialog::class.java.name)
-        }
+            }
 
-        saveImg.setOnClickListener {
-            lifecycleScope.launch {
-                fileManager.saveDrawing(this@MainActivity, drawingView.getSavingBitmap())
-                Toast.makeText(this@MainActivity, "Image saved successfully!", Toast.LENGTH_SHORT)
-                    .show()
+            binding.paintingBtn.id -> {
+                val intent = Intent(this, PaintingActivity::class.java)
+                startActivity(intent)
             }
         }
-        seekBar.setOnSeekBarChangeListener(object : OnSeekBarChangeListener {
-            override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-                drawingView.setWidthPaint(progress)
-            }
-
-            override fun onStartTrackingTouch(seekBar: SeekBar?) {
-
-            }
-
-            override fun onStopTrackingTouch(seekBar: SeekBar?) {
-
-            }
-        })
-
     }
 
 }

@@ -9,7 +9,6 @@ import android.graphics.Paint
 import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.View
-import com.example.testprogram.R
 
 
 class DrawingView @JvmOverloads constructor(
@@ -33,8 +32,6 @@ class DrawingView @JvmOverloads constructor(
         paint
     }
 
-    private val bmFile3: Bitmap = BitmapFactory.decodeResource(context.resources, R.drawable.test3)
-
     override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
         super.onSizeChanged(w, h, oldw, oldh)
         initCanvasBitmap(w, h)
@@ -48,7 +45,6 @@ class DrawingView @JvmOverloads constructor(
         super.onDraw(canvas)
         canvas.drawBitmap(mBitmap, 0f, 0f, mBitmapPaint)
         lineDrawer.draw(canvas)
-
     }
 
 
@@ -77,10 +73,6 @@ class DrawingView @JvmOverloads constructor(
 
     fun editPaint() {
         lineDrawer.editPaint()
-    }
-
-    fun getSavingBitmap(): Bitmap {
-        return mBitmap
     }
 
     fun setWidthPaint(width: Int) {

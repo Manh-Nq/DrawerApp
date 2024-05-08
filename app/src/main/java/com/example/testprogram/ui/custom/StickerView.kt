@@ -24,7 +24,7 @@ class StickerView @JvmOverloads constructor(
 
     init {
         // Load the sticker bitmap
-        stickerBitmap = BitmapFactory.decodeResource(resources, R.drawable.test)
+        stickerBitmap = BitmapFactory.decodeResource(resources, R.drawable.sticker_1)
     }
 
     override fun onDraw(canvas: Canvas) {
