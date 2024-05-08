@@ -1,13 +1,12 @@
 package com.example.testprogram.ui.custom
 
-import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Matrix
 import android.graphics.PointF
 import android.view.MotionEvent
 
-class ImageDrawer(private val context: Context, val invalidate: () -> Unit) {
+class StickerDrawer(val invalidate: () -> Unit) {
 
     private val stickers: MutableList<Sticker> = ArrayList()
     private var currentStickerIndex = -1

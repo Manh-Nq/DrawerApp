@@ -3,10 +3,6 @@ package com.example.testprogram.ui.dialog
 import android.app.Dialog
 import android.content.Context
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
-import androidx.fragment.app.DialogFragment
 import androidx.recyclerview.widget.GridLayoutManager
 import com.example.testprogram.R
 import com.example.testprogram.databinding.StickerDialogBinding
@@ -24,11 +20,11 @@ class StickerDialog(private val context: Context,private val onItemClicked: (Sti
 
     }
 
-    private val list = mutableListOf<StickerData>()
+    private val stickers = mutableListOf<StickerData>()
     init {
-        list.add(StickerData(R.drawable.sticker_1))
-        list.add(StickerData(R.drawable.sticker_2))
-        list.add(StickerData(R.drawable.sticker_3))
+        stickers.add(StickerData(R.drawable.sticker_1))
+        stickers.add(StickerData(R.drawable.sticker_2))
+        stickers.add(StickerData(R.drawable.sticker_3))
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -44,6 +40,6 @@ class StickerDialog(private val context: Context,private val onItemClicked: (Sti
         rvSticker.layoutManager = GridLayoutManager(this@StickerDialog.context, 3)
         rvSticker.adapter = adapter
         rvSticker.setHasFixedSize(true)
-        adapter.submitList(list)
+        adapter.submitList(stickers)
     }
 }

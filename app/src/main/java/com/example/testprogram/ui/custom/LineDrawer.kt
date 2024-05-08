@@ -14,7 +14,7 @@ import kotlin.math.abs
 
 class LineDrawer(private val context: Context, val invalidate: () -> Unit) {
 
-    private val imageDrawer by lazy { ImageDrawer(context, invalidate = { invalidate() }) }
+    private val stickerDrawer by lazy { StickerDrawer(invalidate = { invalidate() }) }
 
     private val pathPaint by lazy {
         val paint = Paint().apply {
@@ -49,13 +49,12 @@ class LineDrawer(private val context: Context, val invalidate: () -> Unit) {
     private var mY = 0f
 
 
-
     companion object {
         private const val TOUCH_TOLERANCE = 4f
     }
 
     fun draw(canvas: Canvas) {
-        imageDrawer.onDraw(canvas)
+        stickerDrawer.onDraw(canvas)
 
         canvas.drawPath(mPath, pathPaint)
         if (isClearMode && isMoving) {
@@ -69,8 +68,8 @@ class LineDrawer(private val context: Context, val invalidate: () -> Unit) {
 
 
     fun onTouchEvent(event: MotionEvent) {
-       val touch =  imageDrawer.onTouchEvent(event)
-        if(!touch){
+        val touch = stickerDrawer.onTouchEvent(event)
+        if (!touch) {
             val x = event.x
             val y = event.y
             when (event.action) {
@@ -115,7 +114,6 @@ class LineDrawer(private val context: Context, val invalidate: () -> Unit) {
     }
 
     fun erasePaint() {
-        mCanvas.save()
         if (!isClearMode) {
             isClearMode = true
             pathPaint.xfermode = PorterDuffXfermode(PorterDuff.Mode.CLEAR)
@@ -126,12 +124,11 @@ class LineDrawer(private val context: Context, val invalidate: () -> Unit) {
         if (isClearMode) {
             pathPaint.xfermode = null
             isClearMode = false
-            mCanvas.restore()
         }
     }
 
-    fun addSticker(bitmap: Bitmap){
-        imageDrawer.addBitmap(bitmap)
+    fun addSticker(bitmap: Bitmap) {
+        stickerDrawer.addBitmap(bitmap)
     }
 
     fun editPaint() {
