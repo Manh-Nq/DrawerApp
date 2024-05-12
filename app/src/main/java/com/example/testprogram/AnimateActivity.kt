@@ -106,6 +106,7 @@ class AnimateActivity : AppCompatActivity() {
 
             override fun onAnimationEnd(animation: Animation) {
                 solvedEndAnimate()
+
             }
 
             override fun onAnimationRepeat(animation: Animation) {
