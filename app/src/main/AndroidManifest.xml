@@ -1,10 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
-    <uses-permission android:name="android.permission.INTERNET"/>
-    <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE"/>
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <!-- Custom Permissions -->
+    <permission
+        android:name="com.example.apilessonapp.WRITE_DATABASE"
+        android:protectionLevel="signature" />
+    <permission
+        android:name="com.example.apilessonapp.READ_DATABASE"
+        android:protectionLevel="signature" />
 
     <application
         android:allowBackup="true"
@@ -16,6 +24,16 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.TestProgram"
         tools:targetApi="31">
+        <provider
+            android:name=".contentprovider.StudentProvider"
+            android:authorities="com.example.apilessonapp"
+            android:enabled="true"
+            android:exported="true"
+            android:multiprocess="true"
+            android:readPermission="com.example.apilessonapp.READ_DATABASE"
+            android:writePermission="com.example.apilessonapp.WRITE_DATABASE" />
+
+
         <activity
             android:name=".MainActivity"
             android:exported="true"
@@ -27,9 +45,8 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
-        <activity android:name=".PaintingActivity"/>
-        <activity android:name=".AnimateActivity"/>
+        <activity android:name=".PaintingActivity" />
+        <activity android:name=".AnimateActivity" />
     </application>
 
 </manifest>

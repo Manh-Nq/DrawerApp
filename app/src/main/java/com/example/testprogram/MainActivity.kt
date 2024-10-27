@@ -43,14 +43,16 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
     override fun onClick(v: View?) {
         when (v?.id) {
             binding.animationBtn.id -> {
-                val intent = Intent(this, AnimateActivity::class.java)
-                startActivity(intent)
+                /*val intent = Intent(this, AnimateActivity::class.java)
+                startActivity(intent)*/
+                binding.waveView.runOrPause()
             }
 
             binding.paintingBtn.id -> {
                 val intent = Intent(this, PaintingActivity::class.java)
                 startActivity(intent)
             }
+
         }
     }
 

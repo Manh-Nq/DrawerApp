@@ -1,10 +1,12 @@
 package com.example.testprogram.ui.custom
 
+import android.R.attr.text
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Matrix
 import android.graphics.PointF
 import android.view.MotionEvent
+
 
 class StickerDrawer(val invalidate: () -> Unit) {
 
@@ -25,7 +27,6 @@ class StickerDrawer(val invalidate: () -> Unit) {
     fun onTouchEvent(event: MotionEvent): Boolean {
         val touchX = event.x
         val touchY = event.y
-
         when (event.action) {
             MotionEvent.ACTION_DOWN -> {
                 movingStickerIndex = findStickerIndexAtPosition(touchX, touchY)

@@ -26,5 +26,10 @@
         android:padding="16dp"
         android:text="Animation Activity" />
 
+    <com.example.testprogram.ui.custom.WaveView
+        android:id="@+id/wave_view"
+        android:background="@color/black"
+        android:layout_width="100dp"
+        android:layout_height="100dp" />
 
 </LinearLayout>
