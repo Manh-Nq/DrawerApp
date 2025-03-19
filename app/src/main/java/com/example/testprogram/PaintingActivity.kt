@@ -2,11 +2,14 @@ package com.example.testprogram
 
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.Environment
 import android.provider.Settings
+import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.WindowCompat
 import android.view.View
@@ -15,18 +18,63 @@ import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
-import com.example.testprogram.databinding.ActivityMainBinding
+import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.ItemTouchHelper
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.example.testprogram.databinding.ActivityPaintingBinding
 import com.example.testprogram.ui.FileManager
+import com.example.testprogram.ui.adapter.PreviewStickerAdapter
+import com.example.testprogram.ui.adapter.StickerData
 import com.example.testprogram.ui.assignViews
+import com.example.testprogram.ui.custom.StickerDrawer
+import com.example.testprogram.ui.custom.dpToPx
+import com.example.testprogram.ui.custom.model.Sticker
 import com.example.testprogram.ui.dialog.StickerDialog
 import com.example.testprogram.ui.listener.CustomOnSeekBarChangeListener
+import com.example.testprogram.ui.toSticker
 import kotlinx.coroutines.launch
+import java.util.Collections
 
 class PaintingActivity : AppCompatActivity(), View.OnClickListener {
 
     private lateinit var binding: ActivityPaintingBinding
     private val fileManager by lazy { FileManager() }
+    private val previewAdapter by lazy { PreviewStickerAdapter(onItemClicked =this::handleRemoveSticker) }
+    private var stickers: MutableList<Sticker> = ArrayList()
+
+
+    val itemTouchHelperCallback = object : ItemTouchHelper.SimpleCallback(
+        ItemTouchHelper.UP or ItemTouchHelper.DOWN or
+                ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT, 0) { // Allow dragging in any direction
+
+        override fun onMove(
+            recyclerView: RecyclerView,
+            viewHolder: RecyclerView.ViewHolder,
+            target: RecyclerView.ViewHolder
+        ): Boolean {
+            val fromPosition = viewHolder.absoluteAdapterPosition
+            val toPosition = target.absoluteAdapterPosition
+
+            Collections.swap(stickers, fromPosition, toPosition)
+            binding.drawingView.reorderStickers(stickers)
+
+            recyclerView.adapter?.notifyItemMoved(fromPosition, toPosition)
+
+            return true
+        }
+
+        override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+        }
+
+        override fun isLongPressDragEnabled(): Boolean {
+            return true
+        }
+    }
+
+    // Attach ItemTouchHelper to RecyclerView
+    val itemTouchHelper = ItemTouchHelper(itemTouchHelperCallback)
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         WindowCompat.setDecorFitsSystemWindows(window, false)
@@ -49,6 +97,25 @@ class PaintingActivity : AppCompatActivity(), View.OnClickListener {
             }
         })
 
+        initPreviews()
+
+    }
+
+    private fun initPreviews() = with(binding.rvPreview) {
+        layoutManager = LinearLayoutManager(this@PaintingActivity, LinearLayoutManager.HORIZONTAL, false)
+        adapter = previewAdapter
+        itemTouchHelper.attachToRecyclerView(this)
+
+        setHasFixedSize(true)
+    }
+
+    private fun handleRemoveSticker(item: Sticker?) {
+        val currentItem = item?: return
+
+        stickers.removeIf { it.id == currentItem.id }
+        previewAdapter.submitList(stickers.toMutableList())
+
+        binding.drawingView.removeSticker(currentItem)
     }
 
     override fun onClick(v: View?) {
@@ -90,10 +157,30 @@ class PaintingActivity : AppCompatActivity(), View.OnClickListener {
     private fun showStickerDialog() {
         val dialog = StickerDialog(this, onItemClicked = {
             if (it == null) return@StickerDialog
-            binding.drawingView.addSticker(it.resId)
+            val bitmap = createBitmapFromRes(it) ?: return@StickerDialog
+
+            val newSticker = bitmap.toSticker
+
+            stickers.add(newSticker)
+
+            Log.d("ManhNQ", "showStickerDialog: $stickers")
+
+            previewAdapter.submitList(stickers.toMutableList())
+
+            binding.drawingView.addSticker(newSticker)
         })
 
         dialog.show()
+    }
+
+    private fun createBitmapFromRes(it: StickerData, size: Float = 56f): Bitmap? {
+        val bm = BitmapFactory.decodeResource(resources, it.resId)
+        bm?.let { bitmap ->
+            val size = dpToPx(size).toInt()
+
+            return Bitmap.createScaledBitmap(bitmap, size, size, true)
+        }
+        return null
     }
 
     private fun requestStoragePermissions(onGranted: () -> Unit) {

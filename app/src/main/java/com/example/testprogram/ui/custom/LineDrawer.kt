@@ -1,7 +1,6 @@
 package com.example.testprogram.ui.custom
 
 import android.content.Context
-import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
@@ -9,6 +8,7 @@ import android.graphics.Path
 import android.graphics.PorterDuff
 import android.graphics.PorterDuffXfermode
 import android.view.MotionEvent
+import com.example.testprogram.ui.custom.model.Sticker
 import com.example.testprogram.ui.dpToPx
 import kotlin.math.abs
 
@@ -127,8 +127,16 @@ class LineDrawer(private val context: Context, val invalidate: () -> Unit) {
         }
     }
 
-    fun addSticker(bitmap: Bitmap) {
-        stickerDrawer.addBitmap(bitmap)
+    fun addSticker(sticker: Sticker) {
+        stickerDrawer.addSticker(sticker)
+    }
+
+    fun removeSticker(sticker: Sticker) {
+        stickerDrawer.removeSticker(sticker)
+    }
+
+    fun reorderStickers(stickers: List<Sticker>) {
+        stickerDrawer.reorderStickers(stickers)
     }
 
     fun editPaint() {

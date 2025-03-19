@@ -2,13 +2,13 @@ package com.example.testprogram.ui.custom
 
 import android.content.Context
 import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
 import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.View
+import com.example.testprogram.ui.custom.model.Sticker
 
 
 class DrawingView @JvmOverloads constructor(
@@ -64,11 +64,17 @@ class DrawingView @JvmOverloads constructor(
         lineDrawer.erasePaint()
     }
 
-    fun addSticker(resId:Int) {
-        val bm =  BitmapFactory.decodeResource(context.resources, resId)
-        if (bm!=null){
-            lineDrawer.addSticker(bm)
-        }
+    fun addSticker(sticker: Sticker) {
+        lineDrawer.addSticker(sticker)
+    }
+
+
+    fun removeSticker(sticker: Sticker) {
+        lineDrawer.removeSticker(sticker)
+    }
+
+    fun reorderStickers(stickers: List<Sticker>) {
+        lineDrawer.reorderStickers(stickers)
     }
 
     fun editPaint() {

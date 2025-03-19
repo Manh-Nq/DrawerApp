@@ -22,9 +22,15 @@ class StickerDialog(private val context: Context,private val onItemClicked: (Sti
 
     private val stickers = mutableListOf<StickerData>()
     init {
-        stickers.add(StickerData(R.drawable.sticker_1))
-        stickers.add(StickerData(R.drawable.sticker_2))
-        stickers.add(StickerData(R.drawable.sticker_3))
+        stickers.add(StickerData(R.drawable.ic_sticker_1))
+        stickers.add(StickerData(R.drawable.ic_sticker_2))
+        stickers.add(StickerData(R.drawable.ic_sticker_3))
+        stickers.add(StickerData(R.drawable.ic_sticker_4))
+        stickers.add(StickerData(R.drawable.ic_sticker_5))
+        stickers.add(StickerData(R.drawable.ic_sticker_7))
+        stickers.add(StickerData(R.drawable.ic_sticker_8))
+        stickers.add(StickerData(R.drawable.ic_sticker_9))
+        stickers.add(StickerData(R.drawable.ic_sticker_10))
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
