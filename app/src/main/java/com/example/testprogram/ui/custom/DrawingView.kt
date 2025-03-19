@@ -17,73 +17,36 @@ class DrawingView @JvmOverloads constructor(
     defStyle: Int = 0
 ) : View(context, attrs, defStyle) {
 
-    private val lineDrawer by lazy { LineDrawer(context, invalidate = { invalidate() }) }
-    private lateinit var mCanvas: Canvas
+    private val stickerDrawer by lazy { StickerDrawer(invalidate = { invalidate() }) }
 
-    private lateinit var mBitmap: Bitmap
-
-    private val mBitmapPaint: Paint by lazy { Paint(Paint.DITHER_FLAG) }
-    private val backgroundPaint by lazy {
-        val paint = Paint().apply {
-            isAntiAlias = true
-            color = Color.WHITE
-            style = Paint.Style.FILL
-        }
-        paint
-    }
 
     override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
         super.onSizeChanged(w, h, oldw, oldh)
-        initCanvasBitmap(w, h)
-
-        mCanvas.drawRect(0f, 0f, w.toFloat(), h.toFloat(), backgroundPaint)
-
         setLayerType(LAYER_TYPE_HARDWARE, null)
+    }
+
+    fun addSticker(sticker: Sticker) {
+        stickerDrawer.addSticker(sticker)
+    }
+
+    fun removeSticker(sticker: Sticker) {
+        stickerDrawer.removeSticker(sticker)
+    }
+
+    fun reorderStickers(stickers: List<Sticker>) {
+        stickerDrawer.reorderStickers(stickers)
     }
 
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
-        canvas.drawBitmap(mBitmap, 0f, 0f, mBitmapPaint)
-        lineDrawer.draw(canvas)
+        stickerDrawer.onDraw(canvas)
     }
 
 
     override fun onTouchEvent(event: MotionEvent): Boolean {
-        lineDrawer.onTouchEvent(event)
+        stickerDrawer.onTouchEvent(event)
         return true
     }
 
-    private fun initCanvasBitmap(w: Int, h: Int) {
-        mBitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888)
-        mCanvas = Canvas(mBitmap)
-
-        lineDrawer.attach(canvas = mCanvas)
-    }
-
-    fun erasePaint() {
-        lineDrawer.erasePaint()
-    }
-
-    fun addSticker(sticker: Sticker) {
-        lineDrawer.addSticker(sticker)
-    }
-
-
-    fun removeSticker(sticker: Sticker) {
-        lineDrawer.removeSticker(sticker)
-    }
-
-    fun reorderStickers(stickers: List<Sticker>) {
-        lineDrawer.reorderStickers(stickers)
-    }
-
-    fun editPaint() {
-        lineDrawer.editPaint()
-    }
-
-    fun setWidthPaint(width: Int) {
-        lineDrawer.setWidthPaint(width)
-
-    }
 }
 

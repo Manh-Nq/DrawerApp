@@ -32,24 +32,6 @@
 
         <androidx.appcompat.widget.AppCompatImageView
             android:background="?attr/selectableItemBackground"
-            android:id="@+id/edit_img"
-            android:layout_height="48dp"
-            android:layout_weight="1"
-            android:layout_width="0dp"
-            android:scaleType="centerInside"
-            app:srcCompat="@drawable/edit_drawable_icon" />
-
-        <androidx.appcompat.widget.AppCompatImageView
-            android:background="?attr/selectableItemBackground"
-            android:id="@+id/erase_img"
-            android:layout_height="48dp"
-            android:layout_weight="1"
-            android:layout_width="0dp"
-            android:scaleType="centerInside"
-            app:srcCompat="@drawable/erase_drawable_icon" />
-
-        <androidx.appcompat.widget.AppCompatImageView
-            android:background="?attr/selectableItemBackground"
             android:id="@+id/sticker_img"
             android:layout_height="48dp"
             android:layout_weight="1"
@@ -74,32 +56,8 @@
         android:layout_height="64dp"
         android:layout_margin="16dp"
         android:layout_width="match_parent"
-        app:layout_constraintBottom_toTopOf="@+id/seek_bar_ln"
+        app:layout_constraintBottom_toTopOf="@+id/action_ln"
         app:layout_constraintTop_toBottomOf="@+id/drawing_container" />
-
-    <LinearLayout
-        android:id="@+id/seek_bar_ln"
-        android:layout_height="wrap_content"
-        android:layout_width="match_parent"
-        android:orientation="horizontal"
-        app:layout_constraintBottom_toTopOf="@id/action_ln">
-
-        <androidx.appcompat.widget.AppCompatTextView
-            android:fontFamily="sans-serif-medium"
-            android:gravity="center"
-            android:layout_height="match_parent"
-            android:layout_width="wrap_content"
-            android:paddingStart="16dp"
-            android:text="Size" />
-
-        <androidx.appcompat.widget.AppCompatSeekBar
-            android:id="@+id/seek_bar"
-            android:layout_height="48dp"
-            android:layout_weight="1"
-            android:layout_width="0dp"
-            android:max="20"
-            android:min="5" />
-    </LinearLayout>
 
 
     <androidx.appcompat.widget.AppCompatImageView

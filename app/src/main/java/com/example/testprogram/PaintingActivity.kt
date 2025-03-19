@@ -13,12 +13,10 @@ import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.WindowCompat
 import android.view.View
-import android.widget.SeekBar
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
-import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -27,11 +25,9 @@ import com.example.testprogram.ui.FileManager
 import com.example.testprogram.ui.adapter.PreviewStickerAdapter
 import com.example.testprogram.ui.adapter.StickerData
 import com.example.testprogram.ui.assignViews
-import com.example.testprogram.ui.custom.StickerDrawer
 import com.example.testprogram.ui.custom.dpToPx
 import com.example.testprogram.ui.custom.model.Sticker
 import com.example.testprogram.ui.dialog.StickerDialog
-import com.example.testprogram.ui.listener.CustomOnSeekBarChangeListener
 import com.example.testprogram.ui.toSticker
 import kotlinx.coroutines.launch
 import java.util.Collections
@@ -40,13 +36,12 @@ class PaintingActivity : AppCompatActivity(), View.OnClickListener {
 
     private lateinit var binding: ActivityPaintingBinding
     private val fileManager by lazy { FileManager() }
-    private val previewAdapter by lazy { PreviewStickerAdapter(onItemClicked =this::handleRemoveSticker) }
+    private val previewAdapter by lazy { PreviewStickerAdapter(onItemClicked = this::handleRemoveSticker) }
     private var stickers: MutableList<Sticker> = ArrayList()
 
-
-    val itemTouchHelperCallback = object : ItemTouchHelper.SimpleCallback(
+    private val itemTouchHelperCallback = object : ItemTouchHelper.SimpleCallback(
         ItemTouchHelper.UP or ItemTouchHelper.DOWN or
-                ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT, 0) { // Allow dragging in any direction
+                ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT, 0) {
 
         override fun onMove(
             recyclerView: RecyclerView,
@@ -58,7 +53,6 @@ class PaintingActivity : AppCompatActivity(), View.OnClickListener {
 
             Collections.swap(stickers, fromPosition, toPosition)
             binding.drawingView.reorderStickers(stickers)
-
             recyclerView.adapter?.notifyItemMoved(fromPosition, toPosition)
 
             return true
@@ -72,9 +66,7 @@ class PaintingActivity : AppCompatActivity(), View.OnClickListener {
         }
     }
 
-    // Attach ItemTouchHelper to RecyclerView
-    val itemTouchHelper = ItemTouchHelper(itemTouchHelperCallback)
-
+    private val itemTouchHelper = ItemTouchHelper(itemTouchHelperCallback)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         WindowCompat.setDecorFitsSystemWindows(window, false)
@@ -84,64 +76,36 @@ class PaintingActivity : AppCompatActivity(), View.OnClickListener {
         setContentView(binding.root)
 
         initViews()
-
     }
 
     private fun initViews() = with(binding) {
-        assignViews(editImg, eraseImg, saveImg, stickerImg, backImg)
-        changeSelectedMode(false)
-
-        seekBar.setOnSeekBarChangeListener(object : CustomOnSeekBarChangeListener {
-            override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-                drawingView.setWidthPaint(progress)
-            }
-        })
-
+        assignViews(saveImg, stickerImg, backImg)
         initPreviews()
-
     }
 
     private fun initPreviews() = with(binding.rvPreview) {
         layoutManager = LinearLayoutManager(this@PaintingActivity, LinearLayoutManager.HORIZONTAL, false)
         adapter = previewAdapter
         itemTouchHelper.attachToRecyclerView(this)
-
         setHasFixedSize(true)
+
+        previewAdapter.submitList(stickers.toMutableList())
     }
 
     private fun handleRemoveSticker(item: Sticker?) {
-        val currentItem = item?: return
+        val currentItem = item ?: return
 
         stickers.removeIf { it.id == currentItem.id }
         previewAdapter.submitList(stickers.toMutableList())
-
         binding.drawingView.removeSticker(currentItem)
     }
 
     override fun onClick(v: View?) {
         when (v?.id) {
-            binding.editImg.id -> {
-                changeSelectedMode(false)
-                binding.drawingView.editPaint()
-            }
-
-            binding.eraseImg.id -> {
-                changeSelectedMode(true)
-                binding.drawingView.erasePaint()
-            }
-
             binding.stickerImg.id -> showStickerDialog()
-
             binding.saveImg.id -> onSaveImage()
-
             binding.backImg.id -> onBackPressed()
         }
-    }
-
-
-    private fun changeSelectedMode(isErase: Boolean) {
-        binding.editImg.isActivated = !isErase
-        binding.eraseImg.isActivated = isErase
     }
 
     private fun onSaveImage() {
@@ -162,12 +126,9 @@ class PaintingActivity : AppCompatActivity(), View.OnClickListener {
             val newSticker = bitmap.toSticker
 
             stickers.add(newSticker)
-
-            Log.d("ManhNQ", "showStickerDialog: $stickers")
-
+            binding.drawingView.addSticker(newSticker)
             previewAdapter.submitList(stickers.toMutableList())
 
-            binding.drawingView.addSticker(newSticker)
         })
 
         dialog.show()
@@ -177,7 +138,6 @@ class PaintingActivity : AppCompatActivity(), View.OnClickListener {
         val bm = BitmapFactory.decodeResource(resources, it.resId)
         bm?.let { bitmap ->
             val size = dpToPx(size).toInt()
-
             return Bitmap.createScaledBitmap(bitmap, size, size, true)
         }
         return null
@@ -208,6 +168,4 @@ class PaintingActivity : AppCompatActivity(), View.OnClickListener {
             onGranted()
         }
     }
-
-
 }
