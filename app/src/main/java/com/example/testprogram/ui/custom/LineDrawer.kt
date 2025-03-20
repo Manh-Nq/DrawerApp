@@ -14,7 +14,7 @@ import kotlin.math.abs
 
 class LineDrawer(private val context: Context, val invalidate: () -> Unit) {
 
-    private val stickerDrawer by lazy { StickerDrawer(invalidate = { invalidate() }) }
+    private val stickerDrawer by lazy { StickerDrawer(context, invalidate = { invalidate() }) }
 
     private val pathPaint by lazy {
         val paint = Paint().apply {

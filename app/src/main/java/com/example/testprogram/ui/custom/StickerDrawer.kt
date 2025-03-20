@@ -1,18 +1,22 @@
 package com.example.testprogram.ui.custom
 
+import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.Path
 import android.graphics.PointF
+import android.util.Log
 import android.view.MotionEvent
+import com.example.testprogram.R
+import com.example.testprogram.ui.createBitmapFromRes
 import com.example.testprogram.ui.custom.model.Sticker
 import kotlin.math.atan2
 import kotlin.math.pow
 import kotlin.math.sqrt
 
-class StickerDrawer(val invalidate: () -> Unit) {
+class StickerDrawer(val context: Context, val invalidate: () -> Unit) {
 
     private val stickers: MutableList<Sticker> = ArrayList()
     private var currentStickerIndex = -1
@@ -31,12 +35,34 @@ class StickerDrawer(val invalidate: () -> Unit) {
     // Constants
     private val MAX_ZOOM = 5f
     private val MIN_ZOOM = 0.2f
+    private val CONTROL_SIZE = 24f
+    private val rotateSizePx: Float get() = context.dpToPx(CONTROL_SIZE)
 
+    private val rotateIcon: Bitmap? by lazy {
+        val resourceId = R.drawable.ic_rotate
+        val bitmap = context.createBitmapFromRes(resourceId, CONTROL_SIZE)
+
+        bitmap ?: fallbackRotateIcon(CONTROL_SIZE.toInt())
+    }
 
     fun onDraw(canvas: Canvas) {
-        stickers.forEach { sticker ->
+        stickers.forEachIndexed { index, sticker ->
             canvas.drawBitmap(sticker.bitmap, sticker.matrix, null)
+            if (index == currentStickerIndex) {
+
+                val cornerX = sticker.width.toFloat()
+                val cornerY = sticker.height.toFloat()
+
+                val point = floatArrayOf(cornerX, cornerY)
+
+                sticker.matrix.mapPoints(point)
+
+                val rotateIcon = rotateIcon ?: return
+                canvas.drawBitmap(rotateIcon, point[0] - rotateSizePx / 2, point[1] - rotateSizePx / 2, null)
+            }
+
         }
+
     }
 
     fun onTouchEvent(event: MotionEvent): Boolean {
@@ -47,13 +73,18 @@ class StickerDrawer(val invalidate: () -> Unit) {
                 val touchX = event.x
                 val touchY = event.y
 
-                /*if (currentStickerIndex != -1) {
+                if (currentStickerIndex != -1) {
                     // Check if rotate icon was touched
                     val sticker = stickers[currentStickerIndex]
-                    val bounds = sticker.getBounds()
 
-                    val rotateIconCenterX = bounds.right - CONTROL_SIZE / 2
-                    val rotateIconCenterY = bounds.bottom - CONTROL_SIZE / 2
+                    // Calculate the position of the rotate icon based on the sticker's transform
+                    val cornerX = sticker.bitmap.width.toFloat()
+                    val cornerY = sticker.bitmap.height.toFloat()
+                    val point = floatArrayOf(cornerX, cornerY)
+                    sticker.matrix.mapPoints(point)
+
+                    val rotateIconCenterX = point[0]
+                    val rotateIconCenterY = point[1]
 
                     // Check if rotate icon was touched
                     if (distance(touchX, touchY, rotateIconCenterX, rotateIconCenterY) < CONTROL_SIZE) {
@@ -62,9 +93,9 @@ class StickerDrawer(val invalidate: () -> Unit) {
                         lastTouch.y = touchY
                         return true
                     }
-                }*/
+                }
 
-                // Check if a sticker was touched (for moving)
+                // Rest of the method remains the same
                 movingStickerIndex = findStickerIndexAtPosition(touchX, touchY)
                 if (movingStickerIndex != -1) {
                     isMoving = true
@@ -181,13 +212,13 @@ class StickerDrawer(val invalidate: () -> Unit) {
 
         // Calculate rotation angle based on touch movement
         val lastAngle = Math.toDegrees(
-            Math.atan2(
+            atan2(
                 (lastTouch.y - centerY).toDouble(),
                 (lastTouch.x - centerX).toDouble()
             )
         ).toFloat()
         val newAngle = Math.toDegrees(
-            Math.atan2(
+            atan2(
                 (touchY - centerY).toDouble(),
                 (touchX - centerX).toDouble()
             )
@@ -250,31 +281,36 @@ class StickerDrawer(val invalidate: () -> Unit) {
         return true
     }
 
-    private fun createRotateIcon(size: Int): Bitmap {
-        val bitmap = Bitmap.createBitmap(size, size, Bitmap.Config.ARGB_8888)
-        val canvas = Canvas(bitmap)
-        val paint = Paint(Paint.ANTI_ALIAS_FLAG)
+    private fun fallbackRotateIcon(size: Int): Bitmap? {
+        try {
+            val bitmap = Bitmap.createBitmap(size, size, Bitmap.Config.ARGB_8888)
+            val canvas = Canvas(bitmap)
+            val paint = Paint(Paint.ANTI_ALIAS_FLAG)
 
-        // Draw circle background
-        paint.color = Color.WHITE
-        canvas.drawCircle(size/2f, size/2f, size/2f, paint)
+            // Draw circle background
+            paint.color = Color.WHITE
+            canvas.drawCircle(size / 2f, size / 2f, size / 2f, paint)
 
-        // Draw rotate icon
-        paint.color = Color.BLACK
-        paint.style = Paint.Style.STROKE
-        paint.strokeWidth = 2f
-        canvas.drawArc(5f, 5f, size-5f, size-5f, 0f, 270f, false, paint)
+            // Draw rotate icon
+            paint.color = Color.BLACK
+            paint.style = Paint.Style.STROKE
+            paint.strokeWidth = 2f
+            canvas.drawArc(5f, 5f, size - 5f, size - 5f, 0f, 270f, false, paint)
 
-        // Draw arrow
-        val path = Path()
-        path.moveTo(size-10f, size/2f)
-        path.lineTo(size-5f, size/2-5f)
-        path.lineTo(size-5f, size/2+5f)
-        path.close()
-        paint.style = Paint.Style.FILL
-        canvas.drawPath(path, paint)
+            // Draw arrow
+            val path = Path()
+            path.moveTo(size - 10f, size / 2f)
+            path.lineTo(size - 5f, size / 2 - 5f)
+            path.lineTo(size - 5f, size / 2 + 5f)
+            path.close()
+            paint.style = Paint.Style.FILL
+            canvas.drawPath(path, paint)
 
-        return bitmap
+            return bitmap
+        } catch (e: Exception) {
+            Log.e("StickerDrawer", "Error creating rotate icon", e)
+            return null
+        }
     }
 
     private fun findStickerIndexAtPosition(x: Float, y: Float): Int {
@@ -302,4 +338,6 @@ class StickerDrawer(val invalidate: () -> Unit) {
             )
         ).toFloat()
     }
+
+
 }

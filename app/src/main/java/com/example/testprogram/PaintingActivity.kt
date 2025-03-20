@@ -25,6 +25,7 @@ import com.example.testprogram.ui.FileManager
 import com.example.testprogram.ui.adapter.PreviewStickerAdapter
 import com.example.testprogram.ui.adapter.StickerData
 import com.example.testprogram.ui.assignViews
+import com.example.testprogram.ui.createBitmapFromRes
 import com.example.testprogram.ui.custom.dpToPx
 import com.example.testprogram.ui.custom.model.Sticker
 import com.example.testprogram.ui.dialog.StickerDialog
@@ -139,14 +140,6 @@ class PaintingActivity : AppCompatActivity(), View.OnClickListener {
         dialog.show()
     }
 
-    private fun createBitmapFromRes(it: StickerData, size: Float = 56f): Bitmap? {
-        val bm = BitmapFactory.decodeResource(resources, it.resId)
-        bm?.let { bitmap ->
-            val adjustSize = dpToPx(size).toInt()
-            return Bitmap.createScaledBitmap(bitmap, adjustSize, adjustSize, true)
-        }
-        return null
-    }
 
     private fun requestStoragePermissions(onGranted: () -> Unit) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {

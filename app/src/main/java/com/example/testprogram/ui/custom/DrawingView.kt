@@ -18,7 +18,7 @@ class DrawingView @JvmOverloads constructor(
     defStyle: Int = 0
 ) : View(context, attrs, defStyle) {
 
-    private val stickerDrawer by lazy { StickerDrawer(invalidate = { invalidate() }) }
+    private val stickerDrawer by lazy { StickerDrawer(context, invalidate = { invalidate() }) }
     private val mainRect: RectF = RectF()
 
     override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {

@@ -8,6 +8,8 @@ import android.graphics.RectF
 data class Sticker(val id: String, val bitmap: Bitmap) {
     val matrix = Matrix()
     private var currentScale = 1f
+    val width get() = bitmap.width
+    val height get() = bitmap.height
 
     fun initPosition(x: Float, y: Float) {
         matrix.postTranslate(x, y)
