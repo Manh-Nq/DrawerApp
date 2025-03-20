@@ -3,12 +3,15 @@ package com.example.testprogram.ui.custom.model
 import android.graphics.Bitmap
 import android.graphics.Matrix
 import android.graphics.RectF
-import java.sql.Struct
 
 
 data class Sticker(val id: String, val bitmap: Bitmap) {
     val matrix = Matrix()
     private var currentScale = 1f
+
+    fun initPosition(x: Float, y: Float) {
+        matrix.postTranslate(x, y)
+    }
 
     fun move(x: Float, y: Float) {
         matrix.postTranslate(x, y)

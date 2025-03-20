@@ -41,7 +41,8 @@ class PaintingActivity : AppCompatActivity(), View.OnClickListener {
 
     private val itemTouchHelperCallback = object : ItemTouchHelper.SimpleCallback(
         ItemTouchHelper.UP or ItemTouchHelper.DOWN or
-                ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT, 0) {
+                ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT, 0
+    ) {
 
         override fun onMove(
             recyclerView: RecyclerView,
@@ -124,6 +125,10 @@ class PaintingActivity : AppCompatActivity(), View.OnClickListener {
             val bitmap = createBitmapFromRes(it) ?: return@StickerDialog
 
             val newSticker = bitmap.toSticker
+            newSticker.initPosition(
+                binding.drawingView.getRect().width() / 2f - newSticker.getBounds().width() / 2f,
+                binding.drawingView.getRect().height() / 2f - newSticker.getBounds().height() / 2f
+            )
 
             stickers.add(newSticker)
             binding.drawingView.addSticker(newSticker)
@@ -137,8 +142,8 @@ class PaintingActivity : AppCompatActivity(), View.OnClickListener {
     private fun createBitmapFromRes(it: StickerData, size: Float = 56f): Bitmap? {
         val bm = BitmapFactory.decodeResource(resources, it.resId)
         bm?.let { bitmap ->
-            val size = dpToPx(size).toInt()
-            return Bitmap.createScaledBitmap(bitmap, size, size, true)
+            val adjustSize = dpToPx(size).toInt()
+            return Bitmap.createScaledBitmap(bitmap, adjustSize, adjustSize, true)
         }
         return null
     }

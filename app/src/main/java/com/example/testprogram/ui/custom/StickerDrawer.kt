@@ -1,9 +1,16 @@
 package com.example.testprogram.ui.custom
 
+import android.graphics.Bitmap
 import android.graphics.Canvas
+import android.graphics.Color
+import android.graphics.Paint
+import android.graphics.Path
 import android.graphics.PointF
 import android.view.MotionEvent
 import com.example.testprogram.ui.custom.model.Sticker
+import kotlin.math.atan2
+import kotlin.math.pow
+import kotlin.math.sqrt
 
 class StickerDrawer(val invalidate: () -> Unit) {
 
@@ -27,7 +34,7 @@ class StickerDrawer(val invalidate: () -> Unit) {
 
 
     fun onDraw(canvas: Canvas) {
-        for ((index, sticker) in stickers.withIndex()) {
+        stickers.forEach { sticker ->
             canvas.drawBitmap(sticker.bitmap, sticker.matrix, null)
         }
     }
@@ -96,82 +103,15 @@ class StickerDrawer(val invalidate: () -> Unit) {
 
             MotionEvent.ACTION_MOVE -> {
                 if (isMultiTouch && event.pointerCount == 2 && currentStickerIndex != -1) {
-                    // Update points
-                    multiTouchPoint1.set(event.getX(0), event.getY(0))
-                    multiTouchPoint2.set(event.getX(1), event.getY(1))
-
-                    val sticker = stickers[currentStickerIndex]
-                    val bounds = sticker.getBounds()
-                    val centerX = (bounds.left + bounds.right) / 2
-                    val centerY = (bounds.top + bounds.bottom) / 2
-
-                    // Calculate new distance and determine scale factor
-                    val newDistance = distance(
-                        multiTouchPoint1.x, multiTouchPoint1.y,
-                        multiTouchPoint2.x, multiTouchPoint2.y
-                    )
-
-                    if (oldDistance > 0) {
-                        val scaleFactor = newDistance / oldDistance
-                        sticker.scale(scaleFactor, centerX, centerY, MIN_ZOOM, MAX_ZOOM)
-                    }
-
-                    // Calculate new rotation angle
-                    val newRotation = getRotationAngle(multiTouchPoint1, multiTouchPoint2)
-                    val rotation = newRotation - oldRotation
-                    sticker.rotate(rotation, centerX, centerY)
-
-                    // Save current values for next move
-                    oldDistance = newDistance
-                    oldRotation = newRotation
-
-                    invalidate()
-                    return true
+                    return scaleAction(event)
                 }
 
                 if (isRotating && currentStickerIndex != -1) {
-                    val touchX = event.x
-                    val touchY = event.y
-                    val sticker = stickers[currentStickerIndex]
-                    val bounds = sticker.getBounds()
-                    val centerX = (bounds.left + bounds.right) / 2
-                    val centerY = (bounds.top + bounds.bottom) / 2
-
-                    // Calculate rotation angle based on touch movement
-                    val lastAngle = Math.toDegrees(
-                        Math.atan2(
-                            (lastTouch.y - centerY).toDouble(),
-                            (lastTouch.x - centerX).toDouble()
-                        )
-                    ).toFloat()
-                    val newAngle = Math.toDegrees(
-                        Math.atan2(
-                            (touchY - centerY).toDouble(),
-                            (touchX - centerX).toDouble()
-                        )
-                    ).toFloat()
-                    val rotation = newAngle - lastAngle
-
-                    sticker.rotate(rotation, centerX, centerY)
-
-                    lastTouch.x = touchX
-                    lastTouch.y = touchY
-                    invalidate()
-                    return true
+                    return rotateAction(event)
                 }
 
                 if (isMoving && movingStickerIndex != -1) {
-                    val touchX = event.x
-                    val touchY = event.y
-                    val dx = touchX - lastTouch.x
-                    val dy = touchY - lastTouch.y
-                    val sticker = stickers[movingStickerIndex]
-                    sticker.move(dx, dy)
-
-                    lastTouch.x = touchX
-                    lastTouch.y = touchY
-                    invalidate()
-                    return true
+                    return movingAction(event)
                 }
             }
 
@@ -197,6 +137,85 @@ class StickerDrawer(val invalidate: () -> Unit) {
         return false
     }
 
+    private fun scaleAction(event: MotionEvent): Boolean {
+        // Update points
+        multiTouchPoint1.set(event.getX(0), event.getY(0))
+        multiTouchPoint2.set(event.getX(1), event.getY(1))
+
+        val sticker = stickers[currentStickerIndex]
+        val bounds = sticker.getBounds()
+        val centerX = (bounds.left + bounds.right) / 2
+        val centerY = (bounds.top + bounds.bottom) / 2
+
+        // Calculate new distance and determine scale factor
+        val newDistance = distance(
+            multiTouchPoint1.x, multiTouchPoint1.y,
+            multiTouchPoint2.x, multiTouchPoint2.y
+        )
+
+        if (oldDistance > 0) {
+            val scaleFactor = newDistance / oldDistance
+            sticker.scale(scaleFactor, centerX, centerY, MIN_ZOOM, MAX_ZOOM)
+        }
+
+        // Calculate new rotation angle
+        val newRotation = getRotationAngle(multiTouchPoint1, multiTouchPoint2)
+        val rotation = newRotation - oldRotation
+        sticker.rotate(rotation, centerX, centerY)
+
+        // Save current values for next move
+        oldDistance = newDistance
+        oldRotation = newRotation
+
+        invalidate()
+        return true
+    }
+
+    private fun rotateAction(event: MotionEvent): Boolean {
+        val touchX = event.x
+        val touchY = event.y
+        val sticker = stickers[currentStickerIndex]
+        val bounds = sticker.getBounds()
+        val centerX = (bounds.left + bounds.right) / 2
+        val centerY = (bounds.top + bounds.bottom) / 2
+
+        // Calculate rotation angle based on touch movement
+        val lastAngle = Math.toDegrees(
+            Math.atan2(
+                (lastTouch.y - centerY).toDouble(),
+                (lastTouch.x - centerX).toDouble()
+            )
+        ).toFloat()
+        val newAngle = Math.toDegrees(
+            Math.atan2(
+                (touchY - centerY).toDouble(),
+                (touchX - centerX).toDouble()
+            )
+        ).toFloat()
+        val rotation = newAngle - lastAngle
+
+        sticker.rotate(rotation, centerX, centerY)
+
+        lastTouch.x = touchX
+        lastTouch.y = touchY
+        invalidate()
+        return true
+    }
+
+    private fun movingAction(event: MotionEvent): Boolean {
+        val touchX = event.x
+        val touchY = event.y
+        val dx = touchX - lastTouch.x
+        val dy = touchY - lastTouch.y
+        val sticker = stickers[movingStickerIndex]
+        sticker.move(dx, dy)
+
+        lastTouch.x = touchX
+        lastTouch.y = touchY
+        invalidate()
+        return true
+    }
+
     fun addSticker(sticker: Sticker) {
         stickers.add(sticker)
         currentStickerIndex = stickers.size - 1
@@ -204,7 +223,8 @@ class StickerDrawer(val invalidate: () -> Unit) {
     }
 
     fun removeSticker(sticker: Sticker) {
-        stickers.removeIf { item->item.id==sticker.id }
+        stickers.removeIf { item -> item.id == sticker.id }
+
         invalidate()
     }
 
@@ -230,6 +250,32 @@ class StickerDrawer(val invalidate: () -> Unit) {
         return true
     }
 
+    private fun createRotateIcon(size: Int): Bitmap {
+        val bitmap = Bitmap.createBitmap(size, size, Bitmap.Config.ARGB_8888)
+        val canvas = Canvas(bitmap)
+        val paint = Paint(Paint.ANTI_ALIAS_FLAG)
+
+        // Draw circle background
+        paint.color = Color.WHITE
+        canvas.drawCircle(size/2f, size/2f, size/2f, paint)
+
+        // Draw rotate icon
+        paint.color = Color.BLACK
+        paint.style = Paint.Style.STROKE
+        paint.strokeWidth = 2f
+        canvas.drawArc(5f, 5f, size-5f, size-5f, 0f, 270f, false, paint)
+
+        // Draw arrow
+        val path = Path()
+        path.moveTo(size-10f, size/2f)
+        path.lineTo(size-5f, size/2-5f)
+        path.lineTo(size-5f, size/2+5f)
+        path.close()
+        paint.style = Paint.Style.FILL
+        canvas.drawPath(path, paint)
+
+        return bitmap
+    }
 
     private fun findStickerIndexAtPosition(x: Float, y: Float): Int {
         // Search in reverse order to get the topmost sticker first
@@ -242,15 +288,15 @@ class StickerDrawer(val invalidate: () -> Unit) {
     }
 
     private fun distance(x1: Float, y1: Float, x2: Float, y2: Float): Float {
-        return Math.sqrt(
-            Math.pow((x2 - x1).toDouble(), 2.0) +
-                    Math.pow((y2 - y1).toDouble(), 2.0)
+        return sqrt(
+            (x2 - x1).toDouble().pow(2.0) +
+                    (y2 - y1).toDouble().pow(2.0)
         ).toFloat()
     }
 
     private fun getRotationAngle(point1: PointF, point2: PointF): Float {
         return Math.toDegrees(
-            Math.atan2(
+            atan2(
                 (point2.y - point1.y).toDouble(),
                 (point2.x - point1.x).toDouble()
             )
